@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import personService from './services/persons'
 
-const Person = ({ person }) => {
-  return (<p>{person.name} {person.number}</p>)
+const Person = ({ person, handleDelete}) => {
+  return (<p>{person.name} {person.number} <button onClick={handleDelete} value={person.id}>delete</button></p>)
 }
 
 const Filter = (props) => {
@@ -10,20 +11,15 @@ const Filter = (props) => {
     console.log(event.target.value)
     props.setFilter(event.target.value)
   }
-  return(
+  return (
     <div>
-          filter shown with <input value={props.filter} onChange={handleFilterChange} />
+      filter shown with <input value={props.filter} onChange={handleFilterChange} />
     </div>
   )
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
@@ -39,9 +35,14 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
+
+    personService
+      .create(personObject)
+      .then(person => {
+        setPersons(persons.concat(person))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   const handleNameChange = (event) => {
@@ -54,9 +55,34 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
-  const personsToShow = filter 
-  ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
-  : persons 
+  const handleDelete = (event) => {
+
+    console.log(event.target.value)
+    const person = persons.find(x => x.id == event.target.value)
+    if(window.confirm('Delete '+person.name+'?'))
+    personService.poista(person.id)
+    personService
+      .getAll()
+      .then(persons => {
+        console.log('promise fulfilled')
+        setPersons(persons)
+      })  }
+
+  const personsToShow = filter
+    ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
+    : persons
+
+  const hook = () => {
+    console.log('effect')
+    personService
+      .getAll()
+      .then(persons => {
+        console.log('promise fulfilled')
+        setPersons(persons)
+      })
+  }
+
+  useEffect(hook, [])
 
   return (
     <div>
@@ -76,7 +102,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       {personsToShow.map((person) =>
-        <Person key={person.name} person={person}></Person>)}
+        <Person key={person.name} person={person} handleDelete={handleDelete}></Person>)}
     </div>
   )
 
