@@ -43,6 +43,10 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
+      .catch(error => {
+        alert(JSON.stringify(error.response.data))
+        console.log(error.response.data)
+      })
   }
 
   const handleNameChange = (event) => {
