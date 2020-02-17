@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1jVGVzdGFhamEiLCJpZCI6IjVlNGFlODkzYTNlNjhjNWYwYjAxMWVmZSIsImlhdCI6MTU4MTk3MDU4Nn0.zIB2SBrK13iClR-vm6CC7UYTy-72umqfOGVWrCUgzoI
+
+{
+    "title":"test",
+    "author":"McTestaaja",
+    "url": "http://localhost:3003/api/blogs",
+    "likes": 4
+}
